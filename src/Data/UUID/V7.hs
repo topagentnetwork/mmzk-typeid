@@ -56,15 +56,7 @@ genUUID = head <$> genUUIDs 1
 -- In use cases where the ordering is not important, this function is could be
 -- preferred.
 genUUID' :: MonadIO m => m UUID
-genUUID' = do
-  timestamp <- getEpochMilli
-  entropy16 <- getEntropyWord16
-  entropy64 <- getEntropyWord64
-  let bs = runPut do
-        fillTime timestamp
-        fillVerAndRandA entropy16
-        fillVarAndRandB entropy16 entropy64
-  pure . uncurry UUID $ runGet (join (liftM2 (,)) getWord64be) bs
+genUUID' = getEpochMilli >>= genUUIDWithTime'
 {-# INLINE genUUID' #-}
 
 -- | Generate a list of 'UUID'v7s.
